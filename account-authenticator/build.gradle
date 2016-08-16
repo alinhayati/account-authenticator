@@ -13,7 +13,7 @@ def licType = ["Apache-2.0"]
 def licUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
 
 def majorNumber = 1
-def minorNumber = 1
+def minorNumber = 2
 def patchNumber = 0
 
 def _versionCode = majorNumber + minorNumber + patchNumber
