@@ -1,0 +1,71 @@
+apply plugin: 'com.android.library'
+
+def devId = 'alinhayati'
+def devName = 'Ali Nemati Hayati'
+def devEmail = 'alinhayati@gmail.com'
+def libGroup = 'com.digigene.android'
+def libName = 'account-authenticator'
+def libDescription = 'Account authenticator for android using OAuth 2.0'
+def libUrl = 'https://github.com/digigene/account-authenticator'
+def libGitUrl = "$libUrl" + ".git"
+def licName = 'The Apache Software License, Version 2.0'
+def licType = ["Apache-2.0"]
+def licUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+
+def majorNumber = 1
+def minorNumber = 1
+def patchNumber = 0
+
+def _versionCode = majorNumber + minorNumber + patchNumber
+def _versionName = "$majorNumber" + "." + "$minorNumber" + "." + "$patchNumber"
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 24
+        versionCode _versionCode
+        versionName "$_versionName"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = "$libName"
+
+    publishedGroupId = "$libGroup"
+    libraryName = "$libName"
+    artifact = "$libName"
+
+    libraryDescription = "$libDescription"
+
+    siteUrl = "$libUrl"
+    gitUrl = "$libGitUrl"
+
+    libraryVersion = "$_versionName"
+
+    developerId = "$devId"
+    developerName = "$devName"
+    developerEmail = "$devEmail"
+
+    licenseName = "$licName"
+    licenseUrl = "$licUrl"
+    allLicenses = licType
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:24.1.1'
+}
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'

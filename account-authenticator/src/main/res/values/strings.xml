@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">App Name</string>
+    <string name="auth_account_type">An Account Type</string>
+    <string name="auth_msg_account_name_is_null">Account name cannot be null. Please choose an account name, e.g. username,
+        mobile number, etc, first</string>
+    <string name="auth_msg_registration_successful">Registration is successful</string>
+    <string name="auth_msg_account_does_not_exist">Account does not exist. Please first add it</string>
+</resources>
