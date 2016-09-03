@@ -26,4 +26,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.+'
     compile 'com.android.support:support-annotations:24.+'
     compile project(':account-authenticator')
+    /* The following line can be used instead of the above for automatically downloading the library */
+//    compile 'com.digigene.android:account-authenticator:+'
 }
