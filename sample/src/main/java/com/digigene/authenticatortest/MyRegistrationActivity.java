@@ -3,6 +3,7 @@ package com.digigene.authenticatortest;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+
 import com.digigene.accountauthenticator.activity.RegistrationActivity;
 
 public class MyRegistrationActivity extends RegistrationActivity {
@@ -17,7 +18,8 @@ public class MyRegistrationActivity extends RegistrationActivity {
     }
 
     public void startAuthentication(View view) {
-        register(accountNameEditText.getText().toString(), passwordEditText.getText().toString(), null, null);
+        register(accountNameEditText.getText().toString(), passwordEditText.getText().toString(),
+                null, null);
     }
 
 }
