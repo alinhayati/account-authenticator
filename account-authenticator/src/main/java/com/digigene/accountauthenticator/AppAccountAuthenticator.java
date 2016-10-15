@@ -109,13 +109,13 @@ public class AppAccountAuthenticator extends AbstractAccountAuthenticator {
 
     private void loadRegistrationClassFromSharedPref() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String registrationActivityClassName = sharedPreferences.getString(AuthenticatorManager.KEY_REGISTRATION_ACTIVITY_CLASS_NAME, RegistrationActivity.class.toString());
+        String registrationActivityClassName = sharedPreferences.getString(AuthenticatorManager.KEY_REGISTRATION_ACTIVITY_CLASS_NAME, RegistrationActivity.class.getName());
 
         try {
             registrationActivityClass = (Class<? extends RegistrationActivity>) Class.forName(registrationActivityClassName);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            Log.d("AppAccountAuthenticator", "The class name for RegistrationActivity is not correct or it does not extend " + RegistrationActivity.class.toString());
+            Log.d("AppAccountAuthenticator", "The class name for RegistrationActivity is not correct or it does not extend " + RegistrationActivity.class.getName());
         }
     }
 
