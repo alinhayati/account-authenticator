@@ -133,14 +133,14 @@ public class RegistrationActivity extends AccountAuthenticatorActivity {
 
     private void loadInterfaceImplementationFromSharedPref() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(RegistrationActivity.this);
-        String interfaceImplementationClassName = sharedPreferences.getString(AuthenticatorManager.KEY_INTERFACE_IMPLEMENTATION_CLASS_NAME, AbstractInterfaceImplementation.class.toString());
+        String interfaceImplementationClassName = sharedPreferences.getString(AuthenticatorManager.KEY_INTERFACE_IMPLEMENTATION_CLASS_NAME, AbstractInterfaceImplementation.class.getName());
         Class<? extends AbstractInterfaceImplementation> interfaceImplementationClass = null;
         try {
             interfaceImplementationClass = (Class<? extends AbstractInterfaceImplementation>) Class.forName(interfaceImplementationClassName);
             interfaceImplementation = interfaceImplementationClass.newInstance();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            Log.d("AppAccountAuthenticator", "The class name for AbstractInterfaceImplementation is not correct or it does not extend " + AbstractInterfaceImplementation.class.toString());
+            Log.d("AppAccountAuthenticator", "The class name for AbstractInterfaceImplementation is not correct or it does not extend " + AbstractInterfaceImplementation.class.getName());
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
