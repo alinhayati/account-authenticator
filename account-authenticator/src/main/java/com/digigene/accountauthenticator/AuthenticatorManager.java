@@ -54,16 +54,14 @@ public class AuthenticatorManager {
 
     public static AuthenticatorManager authenticatorManager;
     private AbstractInterfaceImplementation interfaceImplementation;
-    private Activity activity;
     private Context context;
     private String[] authTokenTypes;
     private String accountType;
 
-    public AuthenticatorManager(@NonNull Context context, @NonNull String accountType, @NonNull Activity callingActivity, @NonNull Class<? extends RegistrationActivity> registrationActivityClass, @NonNull Class<? extends AbstractInterfaceImplementation> interfaceImplementationClass) {
-        if (callingActivity == null || registrationActivityClass == null || interfaceImplementationClass == null) {
+    public AuthenticatorManager(@NonNull Context context, @NonNull String accountType, @NonNull Class<? extends RegistrationActivity> registrationActivityClass, @NonNull Class<? extends AbstractInterfaceImplementation> interfaceImplementationClass) {
+        if (registrationActivityClass == null || interfaceImplementationClass == null) {
             throw new IllegalArgumentException("None of the arguments in Authenticator Manager shall be null");
         }
-        this.activity = callingActivity;
         this.context = context;
         this.accountType = accountType;
         try {
@@ -85,6 +83,10 @@ public class AuthenticatorManager {
     }
 
     public void getAccessToken(String accountName, String authTokenType, Bundle options) {
+        getAccessToken(accountName, authTokenType, options, null);
+    }
+    
+    public void getAccessToken(String accountName, String authTokenType, Bundle options, Activity activity) {
         if (accountName == null || accountName.trim().isEmpty()) {
             Toast.makeText(context, context.getString(R.string.auth_msg_account_name_is_null), Toast.LENGTH_SHORT).show();
             return;
@@ -107,10 +109,14 @@ public class AuthenticatorManager {
         if (!isAddingNewAccount) {
             accountManagerCallback = getAccessTokenCallBack(authTokenType, options, account);
         }
-        getAccessTokenFromAccountManager(account, authTokenType, options, accountManagerCallback, handler);
+        getAccessTokenFromAccountManager(account, authTokenType, options, accountManagerCallback, handler, activity);
     }
 
     public void addAccount(String authTokenType, String[] requiredFeatures, Bundle options) {
+        addAccount(authTokenType, requiredFeatures, options, null);
+    }
+
+    public void addAccount(String authTokenType, String[] requiredFeatures, Bundle options, Activity activity) {
         AccountManager accountManager = AccountManager.get(context);
         Handler handler = null;
         if (options == null) {
@@ -122,7 +128,7 @@ public class AuthenticatorManager {
         accountManager.addAccount(accountType, authTokenType, requiredFeatures, options, activity, getAddAccountCallBack(), handler);
     }
 
-    private void getAccessTokenFromAccountManager(Account account, String authTokenType, Bundle options, AccountManagerCallback accountManagerCallback, Handler handler) {
+    private void getAccessTokenFromAccountManager(Account account, String authTokenType, Bundle options, AccountManagerCallback accountManagerCallback, Handler handler, Activity activity) {
         AccountManager accountManager = AccountManager.get(context);
         accountManager.getAuthToken(account, authTokenType, options, activity, accountManagerCallback, handler);
     }
