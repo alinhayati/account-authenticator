@@ -31,8 +31,10 @@ import com.digigene.accountauthenticator.AuthenticatorManager;
 import com.digigene.accountauthenticator.R;
 import com.digigene.accountauthenticator.result.RegisterResult;
 
-public class RegistrationActivity extends AccountAuthenticatorActivity {
+public class RegistrationActivity extends AppCompatActivity {
 
+    private AccountAuthenticatorResponse mAccountAuthenticatorResponse = null;
+    private Bundle mResultBundle = null;
     private AbstractInterfaceImplementation interfaceImplementation;
     private String accountName, accountType, authTokenType;
     private String[] requiredFeatures;
@@ -42,6 +44,12 @@ public class RegistrationActivity extends AccountAuthenticatorActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mAccountAuthenticatorResponse =
+                getIntent().getParcelableExtra(AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE);
+
+        if (mAccountAuthenticatorResponse != null) {
+            mAccountAuthenticatorResponse.onRequestContinued();
+        }
     }
 
     @Override
@@ -50,6 +58,19 @@ public class RegistrationActivity extends AccountAuthenticatorActivity {
         Intent startingIntent = getIntent();
         getParamsFromIntent(startingIntent);
         loadInterfaceImplementationFromSharedPref();
+    }
+
+    public void finish() {
+        if (mAccountAuthenticatorResponse != null) {
+            if (mResultBundle != null) {
+                mAccountAuthenticatorResponse.onResult(mResultBundle);
+            } else {
+                mAccountAuthenticatorResponse.onError(AccountManager.ERROR_CODE_CANCELED,
+                        "canceled");
+            }
+            mAccountAuthenticatorResponse = null;
+        }
+        super.finish();
     }
 
     protected void register(String accountName, String password, String[] requiredFeatures, Bundle options) {
@@ -64,6 +85,49 @@ public class RegistrationActivity extends AccountAuthenticatorActivity {
         options.putBoolean(AuthenticatorManager.KEY_IS_ADD_FROM_INSIDE_APP, isFromGetAuth);
         options.putBoolean(AuthenticatorManager.KEY_IS_ADDING_NEW_ACCOUNT, isAddingNewAccount);
         new RegisterAsync(context, accountName, password, requiredFeatures, options).execute();
+    }
+
+    private Bundle makeBundle(String accountName, String accountType, String authTokenType, String refreshToken, Bundle options) {
+        Bundle bundle = new Bundle();
+        bundle.putString(AccountManager.KEY_ACCOUNT_NAME, accountName);
+        bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
+        bundle.putString(AccountManager.KEY_PASSWORD, refreshToken);
+        bundle.putString(AuthenticatorManager.KEY_AUTH_TOKEN_TYPE, authTokenType);
+        bundle.putBundle(AuthenticatorManager.KEY_AUTH_ACCOUNT_OPTIONS, options);
+        return bundle;
+    }
+
+    private void getParamsFromIntent(Intent intent) {
+        if (intent != null) {
+            accountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
+            authTokenType = intent.getStringExtra(AuthenticatorManager.KEY_AUTH_TOKEN_TYPE);
+            requiredFeatures = intent.getStringArrayExtra(AuthenticatorManager.KEY_REQUIRED_FEATURES);
+            options = intent.getBundleExtra(AuthenticatorManager.KEY_AUTH_ACCOUNT_OPTIONS);
+            isFromGetAuth = options.getBoolean(AuthenticatorManager.KEY_IS_ADD_FROM_INSIDE_APP, false);
+            isAddingNewAccount = options.getBoolean(AuthenticatorManager.KEY_IS_ADDING_NEW_ACCOUNT, false);
+            accountName = options.getString(AccountManager.KEY_ACCOUNT_NAME, null);
+        }
+    }
+
+    private void loadInterfaceImplementationFromSharedPref() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(RegistrationActivity.this);
+        String interfaceImplementationClassName = sharedPreferences.getString(AuthenticatorManager.KEY_INTERFACE_IMPLEMENTATION_CLASS_NAME, AbstractInterfaceImplementation.class.getName());
+        Class<? extends AbstractInterfaceImplementation> interfaceImplementationClass = null;
+        try {
+            interfaceImplementationClass = (Class<? extends AbstractInterfaceImplementation>) Class.forName(interfaceImplementationClassName);
+            interfaceImplementation = interfaceImplementationClass.newInstance();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            Log.d("AppAccountAuthenticator", "The class name for AbstractInterfaceImplementation is not correct or it does not extend " + AbstractInterfaceImplementation.class.getName());
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public final void setAccountAuthenticatorResult(Bundle result) {
+        mResultBundle = result;
     }
 
     private class RegisterAsync extends AsyncTask {
@@ -106,45 +170,6 @@ public class RegistrationActivity extends AccountAuthenticatorActivity {
                 throw new RuntimeException("User registration is not successful in authenticator due to the following error:/n" +
                         registerResult.errMessage);
             }
-        }
-    }
-
-    private Bundle makeBundle(String accountName, String accountType, String authTokenType, String refreshToken, Bundle options) {
-        Bundle bundle = new Bundle();
-        bundle.putString(AccountManager.KEY_ACCOUNT_NAME, accountName);
-        bundle.putString(AccountManager.KEY_ACCOUNT_TYPE, accountType);
-        bundle.putString(AccountManager.KEY_PASSWORD, refreshToken);
-        bundle.putString(AuthenticatorManager.KEY_AUTH_TOKEN_TYPE, authTokenType);
-        bundle.putBundle(AuthenticatorManager.KEY_AUTH_ACCOUNT_OPTIONS, options);
-        return bundle;
-    }
-
-    private void getParamsFromIntent(Intent intent) {
-        if (intent != null) {
-            accountType = intent.getStringExtra(AccountManager.KEY_ACCOUNT_TYPE);
-            authTokenType = intent.getStringExtra(AuthenticatorManager.KEY_AUTH_TOKEN_TYPE);
-            requiredFeatures = intent.getStringArrayExtra(AuthenticatorManager.KEY_REQUIRED_FEATURES);
-            options = intent.getBundleExtra(AuthenticatorManager.KEY_AUTH_ACCOUNT_OPTIONS);
-            isFromGetAuth = options.getBoolean(AuthenticatorManager.KEY_IS_ADD_FROM_INSIDE_APP, false);
-            isAddingNewAccount = options.getBoolean(AuthenticatorManager.KEY_IS_ADDING_NEW_ACCOUNT, false);
-            accountName = options.getString(AccountManager.KEY_ACCOUNT_NAME, null);
-        }
-    }
-
-    private void loadInterfaceImplementationFromSharedPref() {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(RegistrationActivity.this);
-        String interfaceImplementationClassName = sharedPreferences.getString(AuthenticatorManager.KEY_INTERFACE_IMPLEMENTATION_CLASS_NAME, AbstractInterfaceImplementation.class.getName());
-        Class<? extends AbstractInterfaceImplementation> interfaceImplementationClass = null;
-        try {
-            interfaceImplementationClass = (Class<? extends AbstractInterfaceImplementation>) Class.forName(interfaceImplementationClassName);
-            interfaceImplementation = interfaceImplementationClass.newInstance();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            Log.d("AppAccountAuthenticator", "The class name for AbstractInterfaceImplementation is not correct or it does not extend " + AbstractInterfaceImplementation.class.getName());
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
         }
     }
 
