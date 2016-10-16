@@ -17,22 +17,14 @@ public class MainActivity extends Activity {
     }
 
     public void signIn(View view) {
-        AuthenticatorManager authenticatorManager = new AuthenticatorManager(MainActivity.this,
-                getString(R.string.auth_account_type), this, MyRegistrationActivity.class,
-                MyInterfaceImplementation.class);
         String authTokenType = "REGULAR_USER";
-        AuthenticatorManager.authenticatorManager = authenticatorManager;
-        authenticatorManager.getAccessToken(accountNameEditText.getText().toString(),
-                authTokenType, null);
+        AuthenticatorManager.authenticatorManager.getAccessToken(accountNameEditText.getText().toString(),
+                authTokenType, null, this);
     }
 
     public void addUser(View view) {
-        AuthenticatorManager authenticatorManager = new AuthenticatorManager(MainActivity.this,
-                getString(R.string.auth_account_type), this, MyRegistrationActivity.class,
-                MyInterfaceImplementation.class);
         String authTokenType = "REGULAR_USER";
-        AuthenticatorManager.authenticatorManager = authenticatorManager;
-        authenticatorManager.addAccount(authTokenType, null, null);
+        AuthenticatorManager.authenticatorManager.addAccount(authTokenType, null, null, this);
     }
 
 }
