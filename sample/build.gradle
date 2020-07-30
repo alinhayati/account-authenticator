@@ -22,8 +22,8 @@ android {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     testImplementation 'junit:junit:4.12'
-    implementation 'com.android.support:appcompat-v7:24.+'
-    implementation 'com.android.support:support-annotations:24.+'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.annotation:annotation:1.0.0'
     implementation project(':account-authenticator')
     /* The following line can be used instead of the above for automatically downloading the library */
 //    compile 'com.digigene.android:account-authenticator:+'
